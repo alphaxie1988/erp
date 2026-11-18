@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <rect width="512" height="512" fill="#1b6fae"/>
+  <g fill="#ffffff">
+    <rect x="56" y="120" width="28" height="272"/>
+    <rect x="428" y="120" width="28" height="272"/>
+    <rect x="56" y="120" width="400" height="34"/>
+  </g>
+  <rect x="150" y="168" width="212" height="84" rx="10" fill="#ffd21f"/>
+  <text x="256" y="232" font-family="Arial, Helvetica, sans-serif" font-size="56" font-weight="bold" text-anchor="middle" fill="#1b2a33">ERP</text>
+  <g fill="#ffffff">
+    <path d="M120 392 L150 340 L240 340 L250 318 L310 318 L322 340 L392 340 L396 392 Z"/>
+    <circle cx="168" cy="392" r="22" fill="#1b2a33"/>
+    <circle cx="344" cy="392" r="22" fill="#1b2a33"/>
+  </g>
+</svg>
