@@ -70,7 +70,7 @@
     .veh-opt{padding:8px 2px}
     .btn{font-size:11px;padding:8px 3px}
   }
-  .btn.primary{background:var(--sign);color:#fff;border-color:var(--sign)}
+  .btn.primary{background:var(--sign);color:#fff;border-color:var(--sign)}#locateBtn,#wakeBtn{background:#fff;color:#131a20;border-color:transparent}
   .btn:active{transform:scale(.98)}
   .hint{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:8px}
   /* selected gantry */
@@ -134,7 +134,7 @@
   .dist{font-size:11px;font-weight:800;background:var(--surface2);border:1px solid var(--line);padding:3px 7px;border-radius:999px;color:var(--muted);white-space:nowrap}
   .free{color:var(--green)} .peak-txt{color:var(--red)}
   footer{margin-top:26px;font-size:12.5px;color:var(--muted);line-height:1.6;border-top:1px solid var(--line);padding-top:14px}
-  .wake-on{background:var(--sign);color:#fff;border-color:var(--sign);outline:2px solid var(--blue);outline-offset:1px}
+  #locateBtn.loc-on,#wakeBtn.wake-on{background:var(--accent);color:var(--accent-ink);border-color:transparent;outline:none}
   /* install prompt — hidden unless the browser offers an install */
   #installBtn{width:100%;margin-top:10px}
   #installBtn[hidden]{display:none}
@@ -546,14 +546,14 @@ $("locateBtn").addEventListener("click",function(){
   $("locateLabel").textContent="Locating…";
   navigator.geolocation.watchPosition(function(pos){
     state.userLat=pos.coords.latitude; state.userLng=pos.coords.longitude;
-    $("locateLabel").textContent="Location on";
+    $("locateLabel").textContent="Location on"; $("locateBtn").classList.add("loc-on");
     // auto-select nearest charging-or-any gantry once
     var sorted=GANTRIES.slice().sort(function(a,b){return haversineKm(state.userLat,state.userLng,a.lat,a.lng)-haversineKm(state.userLat,state.userLng,b.lat,b.lng)});
     if(sorted[0]) state.selectedId=sorted[0].id;
     $("locHint").textContent="Location on — nearest gantry pinned above, list sorted by distance. Updates as you move.";
     renderAll(new Date());
   }, function(err){
-    $("locateLabel").textContent="Location";
+    $("locateLabel").textContent="Location"; $("locateBtn").classList.remove("loc-on");
     $("locHint").textContent="Couldn’t get your location ("+err.message+"). Check location permission — list stays sorted by price.";
   }, {enableHighAccuracy:true, maximumAge:10000, timeout:15000});
 });
