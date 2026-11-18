@@ -122,7 +122,7 @@
   h2{font-size:17px;margin:22px 4px 10px}
   .sub{font-size:13px;color:var(--muted);margin:-6px 4px 10px;line-height:1.5}
   .search{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--text);font-size:16px;min-height:48px}
-  .list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+  .list{display:flex;flex-direction:column;gap:8px;margin-top:10px} .charging-banner{margin:0 4px 10px;padding:10px 14px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);font-size:14px;font-weight:800} .group-head{font-size:13px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 4px 2px}
   .card{display:flex;gap:12px;align-items:center;text-align:left;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;color:var(--text)}
   .card[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
   .card-main{flex:1;min-width:0}
@@ -207,7 +207,7 @@
     </div>
   </section>
 
-  <h2 id="listTitle">Nearby gantries</h2>
+  <h2 id="listTitle">Nearby gantries</h2><div class="charging-banner" id="chargingBanner" role="status">—</div>
   <p class="sub">Only gantries that actually charge are listed — 16 groups in LTA’s current table. Everything else in Singapore is $0 all day. Tap a gantry to pin it above.</p>
   <input class="search" id="search" type="search" placeholder="Search road or gantry — e.g. CTE, KPE, Orchard…" autocomplete="off" />
   <div class="list" id="list"></div>
@@ -473,10 +473,10 @@ function renderChart(g,d){
 
 function renderList(d){
   var q=($("search").value||"").trim().toLowerCase();
-  var items=GANTRIES.map(function(g){
+  var all=GANTRIES.map(function(g){
     var b=bracketsFor(g,d);
     return {g:g, now:b.now.rate, next:b.next1, dist: state.userLat!=null? haversineKm(state.userLat,state.userLng,g.lat,g.lng):null};
-  }).filter(function(it){
+  }); var chargingCount=all.filter(function(it){return it.now>0}).length; var highestNow=Math.max.apply(null,all.map(function(it){return it.now})); var banner=$("chargingBanner"); if(banner) banner.textContent=chargingCount>0?chargingCount+" gantry groups charging now · Highest "+fmtMoney(highestNow)+" now":"No gantry groups charging now · All listed gantries FREE"; var items=all.filter(function(it){
     if(!q) return true;
     return (it.g.name+" "+it.g.road+" "+it.g.nos).toLowerCase().indexOf(q)>=0;
   });
@@ -484,9 +484,9 @@ function renderList(d){
     if(state.userLat!=null) return a.dist-b.dist;
     return b.now-a.now || peakOf(b.g)-peakOf(a.g);
   });
-  $("listTitle").textContent= state.userLat!=null? "Nearest gantries to you" : "Gantries — highest charge now first";
+  var charging=items.filter(function(it){return it.now>0}); var notCharging=items.filter(function(it){return it.now===0}); $("listTitle").textContent= state.userLat!=null? "Nearest gantries to you — "+chargingCount+" charging now" : "Gantries — "+chargingCount+" charging now, highest charge first";
   if(!items.length){ $("list").innerHTML='<p class="sub">No gantry matches that search.</p>'; return; }
-  $("list").innerHTML=items.map(function(it){
+  var cardHTML=function(it){
     var g=it.g;
     var priceCls= it.now===0? "free": (it.now>=4? "peak-txt":"");
     return '<button class="card" data-id="'+g.id+'" aria-pressed="'+(g.id===state.selectedId)+'">'
@@ -495,7 +495,7 @@ function renderList(d){
       +'<span class="card-price"><span class="p '+priceCls+'">'+fmtMoney(it.now)+arrowHTML(it.now, it.next? it.next.rate : null, 18)+'</span>'
       +'<span class="n" style="display:block">'+(it.next? "Next "+fmtMoney(it.next.rate)+" · "+fmtAbs(it.next.s,d) : "—")+'</span></span>'
       +'</button>';
-  }).join("");
+  }; $("list").innerHTML='<div class="group-head">Charging now — highest charge first ('+charging.length+')</div>'+charging.map(cardHTML).join("")+'<div class="group-head">Not charging now ('+notCharging.length+')</div>'+notCharging.map(cardHTML).join("");
   $("list").querySelectorAll(".card").forEach(function(c){
     c.addEventListener("click",function(){
       state.selectedId=c.getAttribute("data-id"); state.previewMin=null; $("previewLine").textContent="";
