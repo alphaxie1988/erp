@@ -40,7 +40,6 @@
   .clock-time{font-variant-numeric:tabular-nums;font-weight:900;line-height:.95;letter-spacing:-.03em;font-size:clamp(64px,17vw,118px);margin:2px 0 0}
   .clock-time .sec{font-size:.52em;color:var(--accent);font-weight:800}
   .clock-date{font-size:15px;color:var(--muted);margin-top:6px;font-weight:600}
-  .status-pill{display:inline-flex;align-items:center;gap:7px;margin-top:10px;padding:7px 12px;border-radius:999px;font-size:13px;font-weight:800;border:1px solid var(--line);background:var(--surface2)}
   .dot{width:9px;height:9px;border-radius:50%;background:var(--green);flex:none}
   .dot.off{background:var(--faint)} .dot.peak{background:var(--red)}
   /* controls — all four controls stay on one row, including on mobile */
@@ -149,8 +148,7 @@
     <div class="clock-label">Singapore time · now</div>
     <div class="clock-time" id="clock">--:--<span class="sec">:--</span></div>
     <div class="clock-date" id="dateLine">—</div>
-    <div><span class="status-pill" id="statusPill"><span class="dot" id="statusDot"></span><span id="statusText">Checking ERP…</span></span></div>
-  </section>
+    section>
 
   <div class="controls">
     <button class="veh-toggle" id="vehToggle" type="button" role="switch" aria-checked="false" data-vehicle="car" aria-label="Vehicle: Car — tap to switch to Bike" title="Tap to switch between Car and Bike">
@@ -505,14 +503,6 @@ function renderList(d){
   });
 }
 
-function renderStatus(d){
-  var wd=isWeekday(d);
-  var charging=GANTRIES.filter(function(g){return bracketsFor(g,d).now.rate>0}).length;
-  var dot=$("statusDot"), txt=$("statusText");
-  if(!wd){ dot.className="dot off"; txt.textContent="Weekend — no ERP charges today"; }
-  else if(charging>0){ dot.className="dot peak"; txt.textContent=charging+" gantry groups charging now · highest "+fmtMoney(Math.max.apply(null,GANTRIES.map(function(g){return bracketsFor(g,d).now.rate}))); }
-  else { dot.className="dot"; txt.textContent="ERP not charging right now — all listed gantries FREE"; }
-}
 
 function tick(){
   var d=new Date();
@@ -521,11 +511,11 @@ function tick(){
   var days=["Sunday","Monday","Tuesday","Wednesday","Thursday","Friday","Saturday"];
   var months=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
   $("dateLine").textContent=days[d.getDay()]+" · "+d.getDate()+" "+months[d.getMonth()]+" "+d.getFullYear()+" · Singapore";
-  renderStatus(d); renderHero(d);
+  renderHero(d);
   // refresh list prices every tick is heavy; do it every 15s or on minute change
   if(d.getSeconds()%15===0 || !$("list").innerHTML) renderList(d);
 }
-function renderAll(d){ renderStatus(d); renderHero(d); renderList(d); }
+function renderAll(d){ renderHero(d); renderList(d); }
 
 // vehicle toggle — one switch: each tap flips Car <-> Bike
 function setVehicle(v){
