@@ -55,12 +55,15 @@
   /* inline SVG control icons (no emoji anywhere) */
   .btn{display:inline-flex;align-items:center;justify-content:center;gap:5px}
   .ic{width:16px;height:16px;flex:none}
-  @media(max-width:560px){.ic{width:14px;height:14px}.btn{gap:4px}.veh-opt{gap:4px}}@media(max-width:560px){#locateBtn{font-size:11px}}@media(max-width:380px){#locateBtn{font-size:10px}}
+  @media(max-width:560px){.ic{width:14px;height:14px}.btn{gap:4px}.veh-opt{gap:4px}}
   @media(max-width:560px){
     .controls{gap:5px}
     .veh-toggle{font-size:12px}
     .veh-opt{padding:8px 4px}
     .btn{font-size:12px;padding:8px 5px}
+    /* "Refresh location" is a longer label — size it down so it still
+       fits its third of the controls row on a phone */
+    #locateBtn{font-size:11px;letter-spacing:-.02em}
   }
   @media(max-width:380px){
     .controls{gap:4px}
@@ -68,8 +71,9 @@
     .veh-thumb{top:2px;bottom:2px;left:2px;width:calc(50% - 2px)}
     .veh-opt{padding:8px 2px}
     .btn{font-size:11px;padding:8px 3px}
+    #locateBtn{font-size:10px}
   }
-  .btn.primary{background:var(--sign);color:#fff;border-color:var(--sign)}#locateBtn,#wakeBtn{background:#fff;color:#131a20;border-color:transparent}
+  .btn.primary{background:var(--sign);color:#fff;border-color:var(--sign)}
   .btn:active{transform:scale(.98)}
   .hint{font-size:12.5px;color:var(--muted);line-height:1.5;margin-top:8px}
   /* selected gantry */
@@ -121,7 +125,7 @@
   h2{font-size:17px;margin:22px 4px 10px}
   .sub{font-size:13px;color:var(--muted);margin:-6px 4px 10px;line-height:1.5}
   .search{width:100%;padding:12px 14px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--text);font-size:16px;min-height:48px}
-  .list{display:flex;flex-direction:column;gap:8px;margin-top:10px} .charging-banner{margin:0 4px 10px;padding:10px 14px;border-radius:12px;background:var(--surface2);border:1px solid var(--line);font-size:14px;font-weight:800} .group-head{font-size:13px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:14px 4px 2px}
+  .list{display:flex;flex-direction:column;gap:8px;margin-top:10px}
   .card{display:flex;gap:12px;align-items:center;text-align:left;width:100%;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px;cursor:pointer;color:var(--text)}
   .card[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent) inset}
   .card-main{flex:1;min-width:0}
@@ -132,7 +136,18 @@
   .card-price .n{font-size:11.5px;color:var(--muted);font-weight:700;margin-top:3px;white-space:nowrap}
   .dist{font-size:11px;font-weight:800;background:var(--surface2);border:1px solid var(--line);padding:3px 7px;border-radius:999px;color:var(--muted);white-space:nowrap}
   .free{color:var(--green)} .peak-txt{color:var(--red)}
+  /* Charging-now summary + grouped list sections inside Gantries */
+  .charging-banner{display:flex;align-items:center;gap:8px;margin:0 0 10px;padding:10px 12px;border-radius:12px;background:var(--surface);border:1px solid var(--line);font-size:14px;font-weight:800;line-height:1.35}
+  .charging-banner .dot{flex:none}
+  .charging-banner .cb-sub{font-weight:600;color:var(--muted);font-size:12.5px}
+  .list-group-head{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:16px 4px 2px}
+  .list-group-head:first-child{margin-top:2px}
+  .list-group-title{font-size:15px;font-weight:900;line-height:1.25}
+  .group-count{flex:none;font-size:11.5px;font-weight:800;background:var(--surface2);border:1px solid var(--line);padding:3px 8px;border-radius:999px;color:var(--muted);white-space:nowrap}
+  .list-group-head.charging-head .group-count{background:var(--accent);color:var(--accent-ink);border-color:transparent}
   footer{margin-top:26px;font-size:12.5px;color:var(--muted);line-height:1.6;border-top:1px solid var(--line);padding-top:14px}
+  /* Location & Screen toggles: white when off, yellow when on, no extra border */
+  #locateBtn,#wakeBtn{background:#fff;color:#131a20;border-color:transparent}
   #locateBtn.loc-on,#wakeBtn.wake-on{background:var(--accent);color:var(--accent-ink);border-color:transparent;outline:none}
   /* install prompt — hidden unless the browser offers an install */
   #installBtn{width:100%;margin-top:10px}
@@ -148,7 +163,7 @@
     <div class="clock-label">Singapore time · now</div>
     <div class="clock-time" id="clock">--:--<span class="sec">:--</span></div>
     <div class="clock-date" id="dateLine">—</div>
-    </section>
+  </section>
 
   <div class="controls">
     <button class="veh-toggle" id="vehToggle" type="button" role="switch" aria-checked="false" data-vehicle="car" aria-label="Vehicle: Car — tap to switch to Bike" title="Tap to switch between Car and Bike">
@@ -159,7 +174,7 @@
     <button class="btn primary" id="locateBtn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg><span id="locateLabel">Refresh location</span></button>
     <button class="btn" id="wakeBtn"><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg><span id="wakeLabel">Screen</span></button>
   </div>
-  <p class="hint" id="locHint">Tap “Refresh location” to sort gantries nearest-first. Tap it again to refresh it. Location stays in your browser — nothing is sent anywhere. Without it, the list is sorted by highest charge right now. Prices below are for cars; bike pays half.</p>
+  <p class="hint" id="locHint">Tap “Refresh location” for a fresh position and to sort gantries nearest-first. Location stays in your browser — nothing is sent anywhere. Without it, the list is sorted by highest charge right now. Prices below are for cars; bike pays half.</p>
   <button class="btn primary" id="installBtn" hidden><svg class="ic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg><span>Install app — add to home screen</span></button>
   <p class="hint" id="installHint" hidden></p>
 
@@ -205,13 +220,14 @@
     </div>
   </section>
 
-  <h2 id="listTitle">Nearby gantries</h2><div class="charging-banner" id="chargingBanner" role="status">—</div>
+  <h2 id="listTitle">Gantries — highest charge now first</h2>
   <p class="sub">Only gantries that actually charge are listed — 16 groups in LTA’s current table. Everything else in Singapore is $0 all day. Tap a gantry to pin it above.</p>
+  <div class="charging-banner" id="chargingBanner" role="status"><span class="dot" id="chargingDot"></span><span><span id="chargingCountText">Checking charging now…</span> <span class="cb-sub" id="chargingHighestText"></span></span></div>
   <input class="search" id="search" type="search" placeholder="Search road or gantry — e.g. CTE, KPE, Orchard…" autocomplete="off" />
   <div class="list" id="list"></div>
 
   <footer>
-    <p><strong>Rates:</strong> LTA ERP rates for passenger cars effective <strong>7 September 2026</strong>, via LTA DataMall (as compiled by MoreBetter / Liddat from the official table). Motorcycle = ½ car rate, heavy goods / small bus = 1.5×, very heavy / big bus = 2×. ERP charges <strong>weekdays only</strong> — no charge Sat, Sun or public holidays; on the eve of major holidays ERP ends at 1pm. A bracket like 07:30–08:00 means from 07:30 inclusive until 08:00 exclusive. LTA reviews rates quarterly, so check <a href="https://onemotoring.lta.gov.sg/content/onemotoring/home/driving/ERP/ERP_ratess.html" target="_blank" rel="noopener">OneMotoring</a> after the next review.</p>
+    <p><strong>Rates:</strong> LTA ERP rates for passenger cars effective <strong>7 September 2026</strong>, via LTA DataMall (as compiled by MoreBetter / Liddat from the official table). <strong>School-holiday rates apply 23 Nov – 31 Dec 2026</strong> — LTA temporarily reduced rates at 12 locations for the December school holidays; normal rates return <strong>4 Jan 2027</strong> (with $1 increases at two spots). Motorcycle = ½ car rate, heavy goods / small bus = 1.5×, very heavy / big bus = 2×. ERP charges <strong>weekdays only</strong> — no charge Sat, Sun or public holidays; on the eve of major holidays ERP ends at 1pm. A bracket like 07:30–08:00 means from 07:30 inclusive until 08:00 exclusive. LTA reviews rates quarterly, so check <a href="https://onemotoring.lta.gov.sg/content/onemotoring/home/driving/ERP/ERP_ratess.html" target="_blank" rel="noopener">OneMotoring</a> after the next review.</p>
     <p>Snapshot built Wed 18 Nov 2026.</p>
   </footer>
 </div>
@@ -238,6 +254,107 @@ var GANTRIES=[
 {id:"cte51", road:"CTE · Evening", name:"CTE northbound between Jalan Bahagia and PIE", nos:"51", lat:1.3225, lng:103.8525, sched:[[M(17,30),M(17,35),0.5],[M(17,35),M(18,55),1],[M(18,55),M(19,0),0.5]]},
 {id:"mce9293", road:"MCE · Evening", name:"MCE eastbound — Maxwell Rd entry · Marina Blvd slip", nos:"92 · 93", lat:1.2795, lng:103.8645, sched:[[M(18,30),M(18,35),0.5],[M(18,35),M(18,55),1],[M(18,55),M(19,0),0.5]]}
 ];
+
+// ---------- Date-driven rate overrides ----------
+// The base sched above stays the 7 Sep 2026 table. Overrides follow LTA's
+// news release "Revised ERP Rates from 23 November 2026" and are stated the
+// way LTA states them: a car rate per half-hour period, as [periodStartMin,
+// carRate] pairs keyed by gantry-group id. schedFor() rebuilds the effective
+// band array for a given date from these — the base bands are never edited.
+// School-holiday reductions: weekdays 23 Nov – 31 Dec 2026 inclusive.
+var HOLIDAY_OVERRIDES={
+  "aye36":  [[M(9,0),0]],
+  "aye-set":[[M(7,30),4],[M(8,30),3],[M(9,0),2],[M(9,30),1]],
+  "cte35":  [[M(7,0),1],[M(7,30),1]],
+  "cte31":  [[M(7,30),1],[M(8,0),3],[M(8,30),4],[M(9,0),3],[M(9,30),2]],
+  "cte68":  [[M(7,30),1],[M(8,0),2],[M(8,30),4],[M(9,0),3],[M(9,30),2]],
+  "cte4667":[[M(18,0),3],[M(18,30),3],[M(19,0),2],[M(19,30),0]],
+  "cte51":  [[M(18,0),0],[M(18,30),0]],
+  "mce9293":[[M(18,30),0]],
+  "kpe50":  [[M(7,0),0],[M(7,30),3],[M(8,0),4],[M(8,30),5],[M(9,0),1],[M(9,30),0]],
+  "pie3738":[[M(8,0),1],[M(9,0),0]],
+  "pie3245":[[M(7,0),0],[M(7,30),1]],
+  "pie65":  [[M(7,30),0]]
+};
+// From 4 Jan 2027: normal rates return, plus two $1 increases.
+var JAN_OVERRIDES={
+  "pie3245":[[M(8,30),5]],
+  "cte51":  [[M(17,0),1]]
+};
+var HOLIDAY_FROM="2026-11-23", HOLIDAY_TO="2026-12-31", JAN_FROM="2027-01-04";
+
+function dateKey(d){ return d.getFullYear()+"-"+String(d.getMonth()+1).padStart(2,"0")+"-"+String(d.getDate()).padStart(2,"0"); }
+
+// Decompose a band array into half-hour periods: a period's rate is the
+// rate of the band covering the middle of that half hour (this reproduces
+// LTA's "Current ERP Rates" column for every affected period).
+function periodRates(sched){
+  var start=Math.floor(sched[0][0]/30)*30;
+  var end=Math.ceil(sched[sched.length-1][1]/30)*30;
+  var periods=[];
+  for(var t=start;t<end;t+=30){
+    var mid=t+15, rate=0;
+    for(var i=0;i<sched.length;i++){ if(mid>=sched[i][0] && mid<sched[i][1]){ rate=sched[i][2]; break; } }
+    periods.push({start:t, rate:rate});
+  }
+  return periods;
+}
+
+// Rebuild a band array from half-hour period rates. Where the rate changes
+// at a period boundary, a 5-minute shoulder band at the midpoint of the two
+// adjacent period rates is added: in the first 5 minutes of a period when
+// the rate rises, in the last 5 minutes of a period when it falls. The rate
+// outside the charging window counts as $0. Adjacent bands at the same rate
+// merge. With no overrides applied this reproduces the base sched exactly.
+function bandsFromPeriods(periods){
+  var bands=[];
+  function push(s,e,r){
+    if(e<=s || r<=0) return;
+    var last=bands[bands.length-1];
+    if(last && last[2]===r && last[1]===s) last[1]=e;
+    else bands.push([s,e,r]);
+  }
+  for(var i=0;i<periods.length;i++){
+    var p=periods[i], s=p.start, e=s+30, r=p.rate;
+    var prevR= i>0? periods[i-1].rate : 0;
+    var nextR= i<periods.length-1? periods[i+1].rate : 0;
+    var mainS=s, mainE=e;
+    if(r>prevR){ push(s, s+5, (prevR+r)/2); mainS=s+5; }   // rising shoulder
+    if(nextR<r){ mainE=e-5; }                              // falling shoulder below
+    push(mainS, mainE, r);
+    if(nextR<r){ push(e-5, e, (r+nextR)/2); }
+  }
+  return bands;
+}
+
+var _schedCache={};
+// Effective band array for gantry group g on date d: holiday overrides on
+// weekdays 23 Nov – 31 Dec 2026, January overrides from 4 Jan 2027, the
+// base sched unchanged on any other date.
+function schedFor(g, d){
+  if(!isWeekday(d)) return g.sched;
+  var key=dateKey(d);
+  var ov=null;
+  if(key>=HOLIDAY_FROM && key<=HOLIDAY_TO) ov=HOLIDAY_OVERRIDES[g.id];
+  else if(key>=JAN_FROM) ov=JAN_OVERRIDES[g.id];
+  if(!ov) return g.sched;
+  var ck=g.id+"|"+key;
+  if(_schedCache[ck]) return _schedCache[ck];
+  var map={};
+  periodRates(g.sched).forEach(function(p){ map[p.start]=p.rate; });
+  var starts=Object.keys(map).map(function(k){ return +k; });
+  var lo=Math.min.apply(null,starts), hi=Math.max.apply(null,starts)+30;
+  ov.forEach(function(pair){
+    map[pair[0]]=pair[1];
+    if(pair[0]<lo) lo=pair[0];           // an override can extend the window
+    if(pair[0]+30>hi) hi=pair[0]+30;    // (e.g. CTE 51 starting at 17:00)
+  });
+  var periods=[];
+  for(var t=lo;t<hi;t+=30) periods.push({start:t, rate: map[t]||0});
+  var bands=bandsFromPeriods(periods);
+  _schedCache[ck]=bands;
+  return bands;
+}
 
 var state={ vehicle:"car", factor:1, selectedId:"kpe50", userLat:null, userLng:null, previewMin:null };
 var $=function(id){return document.getElementById(id)};
@@ -268,7 +385,7 @@ function bracketsFor(g, d){
     var base=off*1440;
     if(isWeekday(day)){
       var cursor=0;
-      g.sched.forEach(function(s){
+      schedFor(g, day).forEach(function(s){
         if(s[0]>cursor) raw.push({s:base+cursor,e:base+s[0],rate:0});
         raw.push({s:base+s[0],e:base+s[1],rate:s[2]});
         cursor=s[1];
@@ -306,12 +423,18 @@ function haversineKm(lat1,lng1,lat2,lng2){
   var a=Math.sin(dLat/2)*Math.sin(dLat/2)+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLng/2)*Math.sin(dLng/2);
   return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
 }
-function peakOf(g){ return Math.max.apply(null, g.sched.map(function(s){return s[2]})); }
-function hoursLabel(g){
-  var s=g.sched[0][0], e=g.sched[g.sched.length-1][1];
+function peakOf(g, d){
+  var s= d? schedFor(g, d) : g.sched;
+  if(!s.length) return 0;
+  return Math.max.apply(null, s.map(function(x){return x[2]}));
+}
+function hoursLabel(g, d){
+  var sched= d? schedFor(g, d) : g.sched;
+  if(!sched.length) sched=g.sched; // fully $0 that day — label the usual window
+  var s=sched[0][0], e=sched[sched.length-1][1];
   // detect split day
-  var split=g.sched.some(function(x,i){ return i>0 && x[0]-g.sched[i-1][1]>60; });
-  if(split) return fmtTime(g.sched[0][0])+"–"+fmtTime(g.sched.filter(function(x){return x[0]<720}).slice(-1)[0][1])+" & evening";
+  var split=sched.some(function(x,i){ return i>0 && x[0]-sched[i-1][1]>60; });
+  if(split) return fmtTime(sched[0][0])+"–"+fmtTime(sched.filter(function(x){return x[0]<720}).slice(-1)[0][1])+" & evening";
   return fmtTime(s)+" – "+fmtTime(e);
 }
 
@@ -332,7 +455,7 @@ function renderHero(d){
   var b=bracketsFor(g,d);
   $("heroRoad").textContent=g.road+" · Gantry "+g.nos;
   $("heroName").textContent=g.name;
-  $("heroMeta").textContent="Weekday charging "+hoursLabel(g)+" · Peak "+fmtMoney(peakOf(g))+" for "+(state.vehicle==="car"?"car":"motorcycle")+(state.userLat!=null? " · "+haversineKm(state.userLat,state.userLng,g.lat,g.lng).toFixed(1)+" km away":"");
+  $("heroMeta").textContent="Weekday charging "+hoursLabel(g,d)+" · Peak "+fmtMoney(peakOf(g,d))+" for "+(state.vehicle==="car"?"car":"motorcycle")+(state.userLat!=null? " · "+haversineKm(state.userLat,state.userLng,g.lat,g.lng).toFixed(1)+" km away":"");
   $("priceNow").textContent=fmtMoney(b.now.rate);
   $("priceNowRange").textContent=b.now.rate===0? "No charge · until "+fmtAbs(b.now.e,d) : fmtAbsRange(b.now,d);
   if(b.next1){ $("priceNext1").textContent=fmtMoney(b.next1.rate); $("priceNext1Range").textContent=fmtAbsRange(b.next1,d); }
@@ -355,16 +478,22 @@ function renderHero(d){
 function renderChart(g,d){
   var W=760,H=190, padL=34, padB=22, padT=14;
   var plotR=W-8, plotB=H-padB;
+  var sched=schedFor(g,d);
+  if(!sched.length){
+    $("chartBox").innerHTML='<p class="hint" style="margin:6px 4px">No charge at this gantry today — FREE all day under the rates in force.</p>';
+    $("legendBreak").hidden=true;
+    return;
+  }
   // Split the schedule into charging blocks separated by long free gaps
   // (>60 min). Each block is drawn at true time scale, but the free gap
   // between blocks is collapsed into a narrow break band, so a split-day
   // gantry (AYE set: 7:00–10:00am + 5:30–6:30pm) fills the chart width
   // with its morning and evening blocks side by side instead of leaving
   // the 10:00am–5:30pm $0 stretch as blank space.
-  var blocks=[], bs=g.sched[0][0], be=g.sched[0][1];
-  for(var i=1;i<g.sched.length;i++){
-    if(g.sched[i][0]-be>60){ blocks.push({s:bs,e:be}); bs=g.sched[i][0]; }
-    be=g.sched[i][1];
+  var blocks=[], bs=sched[0][0], be=sched[0][1];
+  for(var i=1;i<sched.length;i++){
+    if(sched[i][0]-be>60){ blocks.push({s:bs,e:be}); bs=sched[i][0]; }
+    be=sched[i][1];
   }
   blocks.push({s:bs,e:be});
   // 15-minute margin on the outer ends only, so end bars stay off the edges.
@@ -394,7 +523,7 @@ function renderChart(g,d){
     return blocks[blocks.length-1].x1;
   }
   function inSpan(min){ return min>=x0 && min<=x1; }
-  var maxR=Math.max(6, peakOf(g));
+  var maxR=Math.max(6, peakOf(g,d));
   function Y(rate){ return plotB - (rate/maxR)*(plotB-padT); }
   var nm=nowMins(d);
   var parts=[];
@@ -412,7 +541,7 @@ function renderChart(g,d){
   }
   // Draw only the charging segments. $0 / free stretches are skipped
   // entirely so they take no chart space.
-  g.sched.forEach(function(sg0){
+  sched.forEach(function(sg0){
     var sg={s:sg0[0],e:sg0[1],rate:sg0[2]};
     if(sg.rate===0) return;
     var s=Math.max(sg.s,x0), e=Math.min(sg.e,x1); if(e<=s) return;
@@ -461,7 +590,7 @@ function renderChart(g,d){
     r.addEventListener("click",function(){
       var mn=parseInt(r.getAttribute("data-min"),10);
       state.previewMin=mn;
-      var seg=g.sched.find(function(s){return mn>=s[0]&&mn<s[1]});
+      var seg=sched.find(function(s){return mn>=s[0]&&mn<s[1]});
       var rate=seg?seg[2]:0;
       $("previewLine").textContent="Preview: "+fmtTime(mn)+" → "+fmtMoney(rate)+(seg? " ("+fmtRange(seg[0],seg[1])+")":" (no charge)");
       renderChart(g,new Date());
@@ -471,29 +600,55 @@ function renderChart(g,d){
 
 function renderList(d){
   var q=($("search").value||"").trim().toLowerCase();
-  var all=GANTRIES.map(function(g){
+  var allItems=GANTRIES.map(function(g){
     var b=bracketsFor(g,d);
     return {g:g, now:b.now.rate, next:b.next1, dist: state.userLat!=null? haversineKm(state.userLat,state.userLng,g.lat,g.lng):null};
-  }); var chargingCount=all.filter(function(it){return it.now>0}).length; var highestNow=Math.max.apply(null,all.map(function(it){return it.now})); var banner=$("chargingBanner"); if(banner) banner.textContent=chargingCount>0?chargingCount+" gantry groups charging now · Highest "+fmtMoney(highestNow)+" now":"No gantry groups charging now · All listed gantries FREE"; var items=all.filter(function(it){
+  });
+  // Bring the "charging now" count into this Gantries section: it is the
+  // first section here, always sorted highest charge now first.
+  var chargingAll=allItems.filter(function(it){return it.now>0});
+  var chargingCount=chargingAll.length;
+  var highestNow= chargingCount? Math.max.apply(null, chargingAll.map(function(it){return it.now})) : 0;
+  var wd=isWeekday(d);
+  if($("chargingCountText")){
+    if(!wd) $("chargingCountText").textContent="0 gantry groups charging now — weekend, no ERP charges";
+    else if(chargingCount) $("chargingCountText").textContent=chargingCount+(chargingCount===1?" gantry group":" gantry groups")+" charging now";
+    else $("chargingCountText").textContent="0 gantry groups charging now — all FREE right now";
+    $("chargingHighestText").textContent= chargingCount? "· Highest "+fmtMoney(highestNow)+" now · highest charge first below" : "";
+    $("chargingDot").className="dot"+(chargingCount? " peak":" off");
+  }
+  $("listTitle").textContent= chargingCount? ("Gantries — "+chargingCount+" charging now, highest charge first") : "Gantries — highest charge now first";
+  var items=allItems.filter(function(it){
     if(!q) return true;
     return (it.g.name+" "+it.g.road+" "+it.g.nos).toLowerCase().indexOf(q)>=0;
   });
-  items.sort(function(a,b){
-    if(state.userLat!=null) return a.dist-b.dist;
-    return b.now-a.now || peakOf(b.g)-peakOf(a.g);
-  });
-  var charging=items.filter(function(it){return it.now>0}); var notCharging=items.filter(function(it){return it.now===0}); $("listTitle").textContent= state.userLat!=null? "Nearest gantries to you — "+chargingCount+" charging now" : "Gantries — "+chargingCount+" charging now, highest charge first";
   if(!items.length){ $("list").innerHTML='<p class="sub">No gantry matches that search.</p>'; return; }
-  var cardHTML=function(it){
+  // First section: charging now, highest charge now first (always, even
+  // when Location is on). Second section: the rest, nearest-first when
+  // Location is on, otherwise by peak charge.
+  var charging=items.filter(function(it){return it.now>0}).sort(function(a,b){ return b.now-a.now || peakOf(b.g,d)-peakOf(a.g,d) || a.g.name.localeCompare(b.g.name); });
+  var rest=items.filter(function(it){return it.now===0}).sort(function(a,b){
+    if(state.userLat!=null) return a.dist-b.dist;
+    return peakOf(b.g,d)-peakOf(a.g,d) || a.g.name.localeCompare(b.g.name);
+  });
+  function cardHTML(it){
     var g=it.g;
     var priceCls= it.now===0? "free": (it.now>=4? "peak-txt":"");
     return '<button class="card" data-id="'+g.id+'" aria-pressed="'+(g.id===state.selectedId)+'">'
       +'<span class="card-main"><span class="card-name">'+g.name+'</span>'
-      +'<span class="card-sub" style="display:block">'+g.road+' · Gantry '+g.nos+' · '+hoursLabel(g)+(it.dist!=null?' · <span class="dist">'+it.dist.toFixed(1)+' km</span>':'')+'</span></span>'
+      +'<span class="card-sub" style="display:block">'+g.road+' · Gantry '+g.nos+' · '+hoursLabel(g,d)+(it.dist!=null?' · <span class="dist">'+it.dist.toFixed(1)+' km</span>':'')+'</span></span>'
       +'<span class="card-price"><span class="p '+priceCls+'">'+fmtMoney(it.now)+arrowHTML(it.now, it.next? it.next.rate : null, 18)+'</span>'
       +'<span class="n" style="display:block">'+(it.next? "Next "+fmtMoney(it.next.rate)+" · "+fmtAbs(it.next.s,d) : "—")+'</span></span>'
       +'</button>';
-  }; $("list").innerHTML='<div class="group-head">Charging now — highest charge first ('+charging.length+')</div>'+charging.map(cardHTML).join("")+'<div class="group-head">Not charging now ('+notCharging.length+')</div>'+notCharging.map(cardHTML).join("");
+  }
+  var html="";
+  html+='<div class="list-group-head charging-head"><span class="list-group-title">Charging now — highest charge first</span><span class="group-count">'+charging.length+(charging.length===1?" group":" groups")+' charging now</span></div>';
+  html+= charging.length? charging.map(cardHTML).join("") : '<p class="sub" style="margin:2px 4px 0">No gantry group is charging right now — all listed gantries are FREE.</p>';
+  if(rest.length){
+    html+='<div class="list-group-head"><span class="list-group-title">Not charging now</span><span class="group-count">'+rest.length+(rest.length===1?" group":" groups")+' · FREE now</span></div>';
+    html+=rest.map(cardHTML).join("");
+  }
+  $("list").innerHTML=html;
   $("list").querySelectorAll(".card").forEach(function(c){
     c.addEventListener("click",function(){
       state.selectedId=c.getAttribute("data-id"); state.previewMin=null; $("previewLine").textContent="";
@@ -502,7 +657,6 @@ function renderList(d){
     });
   });
 }
-
 
 function tick(){
   var d=new Date();
@@ -530,21 +684,28 @@ function setVehicle(v){
 $("vehToggle").addEventListener("click",function(){ setVehicle(state.vehicle==="car" ? "bike" : "car"); });
 $("search").addEventListener("input",function(){ renderList(new Date()); });
 
-// location
+// location — every press fetches a FRESH position (no cached fix, no
+// continuous watch) and re-sorts nearest-first from it. Pressing again
+// never toggles location off; the button only goes back to white if
+// getting the position fails.
 $("locateBtn").addEventListener("click",function(){
   if(!navigator.geolocation){ $("locHint").textContent="Geolocation isn’t available in this browser — list stays sorted by price."; return; }
   $("locateLabel").textContent="Locating…";
   navigator.geolocation.getCurrentPosition(function(pos){
     state.userLat=pos.coords.latitude; state.userLng=pos.coords.longitude;
-    $("locateLabel").textContent="Refresh location"; $("locateBtn").classList.add("loc-on");
-    // auto-select nearest charging-or-any gantry once
+    $("locateLabel").textContent="Refresh location";
+    $("locateBtn").classList.add("loc-on");
+    // pin the nearest gantry above
     var sorted=GANTRIES.slice().sort(function(a,b){return haversineKm(state.userLat,state.userLng,a.lat,a.lng)-haversineKm(state.userLat,state.userLng,b.lat,b.lng)});
     if(sorted[0]) state.selectedId=sorted[0].id;
-    $("locHint").textContent="Refresh location — nearest gantry pinned above, list sorted by distance. Tap Refresh location again to refresh it.";
+    $("locHint").textContent="Location on — nearest gantry pinned above, list sorted by distance. Tap “Refresh location” again for a fresh position.";
     renderAll(new Date());
   }, function(err){
-    $("locateLabel").textContent="Refresh location";state.userLat=null;state.userLng=null;state.selectedId=null;renderAll(new Date()); $("locateBtn").classList.remove("loc-on");
+    state.userLat=null; state.userLng=null;
+    $("locateLabel").textContent="Refresh location";
+    $("locateBtn").classList.remove("loc-on");
     $("locHint").textContent="Couldn’t get your location ("+err.message+"). Check location permission — list stays sorted by price.";
+    renderAll(new Date());
   }, {enableHighAccuracy:true, maximumAge:0, timeout:15000});
 });
 
